@@ -30,8 +30,14 @@ func _ready():
 func _on_player_move(player_position):
 	var pos = Map.world_to_map(player_position)
 	Player.current_cell = pos
-#	var cell_name = Map.tile_set.tile_get_name(get_player_cell(pos))
-#	Player.available_directions = directions[int(cell_name)]
+	var cell_name = Map.tile_set.tile_get_name(get_player_cell(pos))
+	var cell_walls = int(cell_name)
+	Player.available_directions = {
+		'up': (N & cell_walls) == 0,
+		'down': (S & cell_walls) == 0,
+		'left': (W & cell_walls) == 0,
+		'right': (E & cell_walls) == 0
+	}
 
 func check_neighbors(cell, unvisited):
 	var list = []
