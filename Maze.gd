@@ -24,8 +24,8 @@ func _ready():
 	randomize()
 	tile_size = Map.cell_size
 	generate_maze()
-	position_player()
 	Player.connect('move', self, '_on_player_move')
+	position_player()
 
 func _on_player_move(player_position):
 	var pos = Map.world_to_map(player_position)
@@ -38,6 +38,7 @@ func _on_player_move(player_position):
 		'left': (W & cell_walls) == 0,
 		'right': (E & cell_walls) == 0
 	}
+	print(Player.available_directions)
 
 func check_neighbors(cell, unvisited):
 	var list = []
@@ -76,8 +77,9 @@ func generate_maze():
 
 func position_player():
 	var init_player_pos = get_random_map_tile()
-	Player.position = Map.map_to_world(init_player_pos) + tile_size / 2
-	Player.current_cell = Map.world_to_map(Player.position)
+	var position = Map.map_to_world(init_player_pos) + tile_size / 2
+	Player.set_init_position(position)
+	Player.current_cell = Map.world_to_map(position)
 
 func get_random_map_tile():
 	var used_cells = Map.get_used_cells()

@@ -15,11 +15,14 @@ export var available_directions = {
 var cell_center = Vector2()
 var cell_pos = Vector2()
 var velocity = Vector2()
+var player_size = 10
 signal move(player_position)
 
 onready var playerState = PlayerState.new();
 
-func _ready():
+func set_init_position(pos):
+	position = pos
+	print(get_global_position())
 	emit_signal("move", get_global_position())
 
 func get_input():
@@ -40,22 +43,22 @@ func get_input():
 		playerState.handleDirectionPressed(PlayerState.DIRECTION.DOWN);
 	
 	velocity = Vector2()
-	if Input.is_action_pressed('ui_right'):
+	if Input.is_action_pressed('ui_right') && position.y == cell_center.y:
 		ui_pressed = true
 		velocity.x += 1
-	if Input.is_action_pressed('ui_left'):
+	if Input.is_action_pressed('ui_left') && position.y == cell_center.y:
 		ui_pressed = true
 		velocity.x -= 1
-	if Input.is_action_pressed('ui_up'):
+	if Input.is_action_pressed('ui_up') && position.x == cell_center.x:
 		ui_pressed = true
 		velocity.y -= 1
-	if Input.is_action_pressed('ui_down'):
+	if Input.is_action_pressed('ui_down') && position.x == cell_center.x:
 		ui_pressed = true
 		velocity.y += 1
 	
-
-	velocity = velocity.normalized() * speed
-	emit_signal("move", get_global_position())
+	if ui_pressed:
+		velocity = velocity.normalized() * speed
+		emit_signal("move", get_global_position())
 
 func set_current_cell(cell):
 	current_cell = cell
@@ -63,11 +66,15 @@ func set_current_cell(cell):
 	cell_pos = (cell * size)
 	cell_center = (cell * size) + Vector2(half_size, half_size)
 
-func _physics_process(delta):
+func _process(delta):
 	get_input()
 	position += velocity * delta
 	
 	if available_directions.up == false:
-		position.y = clamp(position.y, cell_center.y, cell_pos.y + size)
+		position.y = clamp(position.y, cell_center.y, cell_center.y + (size / 2))
 	if available_directions.down == false:
-		position.y = clamp(position.y, cell_pos.y + size, cell_center.y)
+		position.y = clamp(position.y, cell_center.y - (size / 2) - 1, cell_center.y)
+	if available_directions.left == false:
+		position.x = clamp(position.x, cell_center.x, cell_center.x + (size / 2))
+	if available_directions.right == false:
+		position.x = clamp(position.x, cell_center.x - (size / 2) - 1, cell_center.x)

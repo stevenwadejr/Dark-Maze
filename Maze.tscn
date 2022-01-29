@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Maze.gd" type="Script" id=1]
 [ext_resource path="res://assets/maze-walls.png" type="Texture" id=2]
@@ -230,6 +230,8 @@
 15/shapes = [  ]
 15/z_index = 0
 
+[sub_resource type="ImageTexture" id=2]
+
 [node name="Maze" type="Node2D"]
 script = ExtResource( 1 )
 
@@ -246,3 +248,6 @@ script = ExtResource( 3 )
 position = Vector2( -5, -5 )
 polygon = PoolVector2Array( 0, 0, 10, 0, 10, 10, 0, 10 )
 vertex_colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )
+
+[node name="Light2D" type="Light2D" parent="Player"]
+texture = SubResource( 2 )
