@@ -1,8 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Maze.gd" type="Script" id=1]
 [ext_resource path="res://assets/maze-walls.png" type="Texture" id=2]
 [ext_resource path="res://Player.gd" type="Script" id=3]
+[ext_resource path="res://assets/potato.png" type="Texture" id=5]
+[ext_resource path="res://Potato.gd" type="Script" id=6]
 
 [sub_resource type="TileSet" id=1]
 0/name = "0"
@@ -230,6 +232,18 @@
 15/shapes = [  ]
 15/z_index = 0
 
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 9.5, 8 )
+
+[sub_resource type="CanvasItemMaterial" id=5]
+blend_mode = 3
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 5, 5 )
+
+[sub_resource type="CanvasItemMaterial" id=6]
+blend_mode = 3
+
 [node name="Maze" type="Node2D"]
 script = ExtResource( 1 )
 
@@ -239,10 +253,37 @@ cell_size = Vector2( 32, 32 )
 cell_custom_transform = Transform2D( 32, 0, 0, 32, 0, 0 )
 format = 1
 
-[node name="Player" type="Node2D" parent="."]
+[node name="Potato" type="Area2D" parent="."]
+script = ExtResource( 6 )
+
+[node name="Sprite" type="Sprite" parent="Potato"]
+scale = Vector2( 0.8, 0.8 )
+texture = ExtResource( 5 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Potato"]
+position = Vector2( -0.5, 0 )
+shape = SubResource( 3 )
+
+[node name="Fog" type="Sprite" parent="."]
+material = SubResource( 5 )
+centered = false
+
+[node name="Player" type="Area2D" parent="."]
 script = ExtResource( 3 )
 
 [node name="Polygon2D" type="Polygon2D" parent="Player"]
 position = Vector2( -5, -5 )
 polygon = PoolVector2Array( 0, 0, 10, 0, 10, 10, 0, 10 )
 vertex_colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource( 4 )
+
+[node name="PlayerCamera" type="Camera2D" parent="Player"]
+current = true
+zoom = Vector2( 0.5, 0.5 )
+
+[node name="ColorMask" type="Sprite" parent="."]
+material = SubResource( 6 )
+
+[connection signal="area_entered" from="Potato" to="Potato" method="_on_Potato_area_entered"]

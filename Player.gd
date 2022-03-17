@@ -2,6 +2,8 @@ extends Node2D
 
 const PlayerState = preload("./PlayerState.gd")
 
+onready var screen_dimensions = get_viewport().size 
+
 export var size = 32
 export var speed = 50
 export var current_cell = Vector2() setget set_current_cell
@@ -11,6 +13,8 @@ export var available_directions = {
 	'left': false,
 	'right': false
 }
+
+var player_position_uv : Vector2
 
 var cell_center = Vector2()
 var cell_pos = Vector2()
@@ -54,8 +58,9 @@ func get_input():
 		velocity.y += 1
 	
 
-	velocity = velocity.normalized() * speed
-	emit_signal("move", get_global_position())
+	if ui_pressed:
+		velocity = velocity.normalized() * speed
+		emit_signal("move", get_global_position())
 
 func set_current_cell(cell):
 	current_cell = cell
@@ -63,11 +68,17 @@ func set_current_cell(cell):
 	cell_pos = (cell * size)
 	cell_center = (cell * size) + Vector2(half_size, half_size)
 
+func _process(delta):
+	# convert player position to UV position
+	player_position_uv = global_position / screen_dimensions
+	# Set shader to player position
+#	get_parent().get_node("ShaderLayer/Torch").material.set_shader_param("player_position",player_position_uv)
+
 func _physics_process(delta):
 	get_input()
 	position += velocity * delta
 	
-	if available_directions.up == false:
-		position.y = clamp(position.y, cell_center.y, cell_pos.y + size)
-	if available_directions.down == false:
-		position.y = clamp(position.y, cell_pos.y + size, cell_center.y)
+#	if available_directions.up == false:
+#		position.y = clamp(position.y, cell_center.y, cell_pos.y + size)
+#	if available_directions.down == false:
+#		position.y = clamp(position.y, cell_pos.y + size, cell_center.y)
