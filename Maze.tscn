@@ -265,8 +265,11 @@ position = Vector2( -0.5, 0 )
 shape = SubResource( 3 )
 
 [node name="Fog" type="Sprite" parent="."]
+visible = false
 material = SubResource( 5 )
 centered = false
+
+[node name="Pings" type="Node2D" parent="."]
 
 [node name="Player" type="Area2D" parent="."]
 script = ExtResource( 3 )

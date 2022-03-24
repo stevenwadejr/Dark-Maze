@@ -1,6 +1,6 @@
 extends Node
 
-export var pressed = [];
+export var pressed = []
 
 const UP = 'up';
 const DOWN = 'down';
@@ -12,9 +12,11 @@ enum DIRECTION {
 	DOWN,
 	LEFT,
 	RIGHT
-};
+}
 
-var nextDirection;
+var nextDirection
+
+var _isMoving = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -22,7 +24,14 @@ func _ready():
 
 func handleDirectionPressed(dir):
 	assert(dir in DIRECTION.values())
-	nextDirection = dir;
+	nextDirection = dir
 
 func getNextDirection():
-	return nextDirection;
+	return nextDirection
+
+func isMoving(state = null):
+	if state == null:
+		return _isMoving
+	
+	assert(typeof(state) == TYPE_BOOL)
+	_isMoving = state

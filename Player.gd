@@ -14,25 +14,22 @@ export var available_directions = {
 	'right': false
 }
 
-var player_position_uv : Vector2
-
 var cell_center = Vector2()
 var cell_pos = Vector2()
 var velocity = Vector2()
+var last_ping_position = Vector2()
+
 signal move(player_position)
+signal drop_ping(ping_position)
 
 onready var playerState = PlayerState.new();
 
 func _ready():
 	emit_signal("move", get_global_position())
+	set_ping()
 
 func get_input():
 	var ui_pressed = false
-	
-	var x = floor(position.x)
-	var y = floor(position.y)
-	var x_diff = abs(cell_center.x - x)
-	var y_diff = abs(cell_center.y - y)
 	
 	if Input.is_action_just_pressed('ui_right') && Input.is_action_pressed('ui_right'):
 		playerState.handleDirectionPressed(PlayerState.DIRECTION.RIGHT);
@@ -57,10 +54,19 @@ func get_input():
 		ui_pressed = true
 		velocity.y += 1
 	
+	playerState.isMoving(ui_pressed)
 
-	if ui_pressed:
+	if playerState.isMoving():
 		velocity = velocity.normalized() * speed
 		emit_signal("move", get_global_position())
+	else:
+		set_ping()
+
+func set_ping():
+	last_ping_position = get_global_position()
+
+func get_ping():
+	return last_ping_position
 
 func set_current_cell(cell):
 	current_cell = cell
@@ -68,15 +74,13 @@ func set_current_cell(cell):
 	cell_pos = (cell * size)
 	cell_center = (cell * size) + Vector2(half_size, half_size)
 
-func _process(delta):
-	# convert player position to UV position
-	player_position_uv = global_position / screen_dimensions
-	# Set shader to player position
-#	get_parent().get_node("ShaderLayer/Torch").material.set_shader_param("player_position",player_position_uv)
-
 func _physics_process(delta):
 	get_input()
 	position += velocity * delta
+
+	if get_ping().distance_to(position) >= 20:
+		emit_signal("drop_ping", get_global_position())
+		set_ping()
 	
 #	if available_directions.up == false:
 #		position.y = clamp(position.y, cell_center.y, cell_pos.y + size)
