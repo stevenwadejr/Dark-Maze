@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://Maze.gd" type="Script" id=1]
 [ext_resource path="res://assets/maze-walls.png" type="Texture" id=2]
@@ -241,6 +241,87 @@ blend_mode = 3
 [sub_resource type="RectangleShape2D" id=4]
 extents = Vector2( 5, 5 )
 
+[sub_resource type="Animation" id=7]
+resource_name = "Enter Secret Passage"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Polygon2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 2.46229, 0.203063 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ), Vector2( 1e-05, 1e-05 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Polygon2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 2.46, 0.203 ),
+"update": 0,
+"values": [ Vector2( -5, -5 ), Vector2( 0, 0 ) ]
+}
+
+[sub_resource type="Animation" id=9]
+resource_name = "Exit Secret Passage"
+tracks/0/type = "value"
+tracks/0/path = NodePath("Polygon2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 0.203, 2.46 ),
+"update": 0,
+"values": [ Vector2( 1e-05, 1e-05 ), Vector2( 1, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Polygon2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 1 ),
+"transitions": PoolRealArray( 0.203, 2.46 ),
+"update": 0,
+"values": [ Vector2( 0, 0 ), Vector2( -5, -5 ) ]
+}
+
+[sub_resource type="Animation" id=8]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Polygon2D:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( 1, 1 ) ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("Polygon2D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Vector2( -5, -5 ) ]
+}
+
 [sub_resource type="CanvasItemMaterial" id=6]
 blend_mode = 3
 
@@ -265,7 +346,6 @@ position = Vector2( -0.5, 0 )
 shape = SubResource( 3 )
 
 [node name="Fog" type="Sprite" parent="."]
-visible = false
 material = SubResource( 5 )
 centered = false
 
@@ -286,7 +366,13 @@ shape = SubResource( 4 )
 current = true
 zoom = Vector2( 0.5, 0.5 )
 
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+"anims/Enter Secret Passage" = SubResource( 7 )
+"anims/Exit Secret Passage" = SubResource( 9 )
+anims/RESET = SubResource( 8 )
+
 [node name="ColorMask" type="Sprite" parent="."]
 material = SubResource( 6 )
 
 [connection signal="area_entered" from="Potato" to="Potato" method="_on_Potato_area_entered"]
+[connection signal="animation_finished" from="Player/AnimationPlayer" to="Player" method="_on_AnimationPlayer_animation_finished"]

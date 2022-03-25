@@ -23,8 +23,6 @@ var tile_size = Vector2(GRID_SIZE, GRID_SIZE)
 var width = 26
 var height = 24
 
-var dead_ends = []
-
 onready var Map = $MazeGrid
 onready var Player = $Player
 onready var Potato = $Potato
@@ -39,6 +37,8 @@ var maze_height = height * GRID_SIZE
 var colorMaskImage = Image.new()
 var colorMaskTexture = ImageTexture.new()
 
+var secret_passages = {}
+
 var fogImage = Image.new()
 var fogTexture = ImageTexture.new()
 var lightImage = LightTexture.get_data()
@@ -49,13 +49,19 @@ func _ready():
 	tile_size = Map.cell_size
 	generate_maze()
 	generate_secret_passages()
+	connect_passageways()
 	position_player()
 	position_potato()
 	overlay_color()
 	generate_fog()
-	update_fog(Player.position)
+#	update_fog(Player.position)
 	Player.connect('move', self, '_on_player_move')
 	Player.connect('drop_ping', self, '_on_player_drop_ping')
+	Player.connect('teleported', self, 'update_fog')
+	
+	# Temporary debugging to test secret passageways with fog
+	Player.position = secret_passages['NW'].position + Vector2(50, 0)
+	update_fog(Player.position)
 
 func generate_fog():
 	fogImage.create(maze_width, maze_height, false, Image.FORMAT_RGBAH)
@@ -156,6 +162,7 @@ func overlay_color():
 	ColorMask.scale *= GRID_SIZE
 
 func generate_secret_passages():
+	var dead_ends = []
 	var quadrant_size = Vector2(int(round(maze_width / 3)), int(round(maze_height / 3)))
 	var quadrants = {
 		'NW': Rect2(Vector2(0, 0), quadrant_size),
@@ -187,36 +194,32 @@ func generate_secret_passages():
 				if wall ^ cell_walls == 0:
 					dead_ends.append(cell_pos)
 				
-
+	# Add dead ends to their respective quadrants
 	for p in dead_ends:
 		var dead_end_pos = Map.map_to_world(p) + tile_size / 2
 		for q in quadrants:
 			if quadrants[q].has_point(dead_end_pos):
 				dead_ends_by_quadrant[q].append(dead_end_pos)
 				break
-#
-#		if quadrants['NE'].has_point(secret_passage.position):
-#			secret_passage.modulate = Color.red
-#			add_child(secret_passage)
-#		elif quadrants['NW'].has_point(secret_passage.position):
-#			secret_passage.modulate = Color.blue
-#			add_child(secret_passage)
-#		elif quadrants['SE'].has_point(secret_passage.position):
-#			secret_passage.modulate = Color.yellow
-#			add_child(secret_passage)
-#		elif quadrants['SW'].has_point(secret_passage.position):
-#			secret_passage.modulate = Color.purple
-#			add_child(secret_passage)
-		
-		
-#		add_child_below_node(Map, secret_passage)
-	print(dead_ends_by_quadrant)
 	
-#	var dead_end = dead_ends[randi() % dead_ends.size()]
-#	var tile_center_pos = Map.map_to_world(dead_end) + tile_size / 2
-#
-#	var secret_passage = SecretPassage.instance()
-#	secret_passage.position = tile_center_pos
-#
-#	add_child_below_node(Map, secret_passage)
-#	print(tile_center_pos)
+	# Randomly generate a secret passageway in each quadrant
+	for dir in dead_ends_by_quadrant:
+		var quads = dead_ends_by_quadrant[dir]
+		var passway = SecretPassage.instance()
+		secret_passages[dir] = passway
+		passway.position = quads[randi() % quads.size()]
+		add_child_below_node(Potato, passway)
+
+func connect_passageways():
+	secret_passages["NW"].set_corresponding_passageway(secret_passages["SE"])
+	secret_passages["SE"].set_corresponding_passageway(secret_passages["NW"])
+	
+	secret_passages["NE"].set_corresponding_passageway(secret_passages["SW"])
+	secret_passages["SW"].set_corresponding_passageway(secret_passages["NE"])
+	
+	for dir in secret_passages:
+		secret_passages[dir].connect('player_entered', self, '_transport_player')
+
+func _transport_player(destination_passageway : SecretPassageway):
+	destination_passageway.accept_incoming()
+	Player.teleport(destination_passageway.position)

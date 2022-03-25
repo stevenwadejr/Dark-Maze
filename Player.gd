@@ -18,17 +18,24 @@ var cell_center = Vector2()
 var cell_pos = Vector2()
 var velocity = Vector2()
 var last_ping_position = Vector2()
+var frozen = false
+var teleport_to = null
 
 signal move(player_position)
 signal drop_ping(ping_position)
+signal teleported(player_position)
 
 onready var playerState = PlayerState.new();
+onready var TransitionAnimation = $AnimationPlayer
 
 func _ready():
 	emit_signal("move", get_global_position())
 	set_ping()
 
 func get_input():
+	if frozen:
+		pass
+
 	var ui_pressed = false
 	
 	if Input.is_action_just_pressed('ui_right') && Input.is_action_pressed('ui_right'):
@@ -74,7 +81,15 @@ func set_current_cell(cell):
 	cell_pos = (cell * size)
 	cell_center = (cell * size) + Vector2(half_size, half_size)
 
+func teleport(destination : Vector2):
+	frozen = true
+	teleport_to = destination
+	TransitionAnimation.play("Enter Secret Passage")
+
 func _physics_process(delta):
+	if frozen:
+		pass
+
 	get_input()
 	position += velocity * delta
 
@@ -86,3 +101,14 @@ func _physics_process(delta):
 #		position.y = clamp(position.y, cell_center.y, cell_pos.y + size)
 #	if available_directions.down == false:
 #		position.y = clamp(position.y, cell_pos.y + size, cell_center.y)
+
+
+func _on_AnimationPlayer_animation_finished(anim_name):
+	if teleport_to is Vector2:
+		frozen = true
+		position = teleport_to
+		emit_signal("teleported", position)
+		teleport_to = null
+		TransitionAnimation.play_backwards("Enter Secret Passage")
+	else:
+		frozen = false
