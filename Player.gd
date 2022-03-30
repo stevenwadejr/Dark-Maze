@@ -26,7 +26,7 @@ signal drop_ping(ping_position)
 signal teleported(player_position)
 
 onready var playerState = PlayerState.new();
-onready var TransitionAnimation = $AnimationPlayer
+onready var DissolveAnimation = $PlayerSprite
 
 func _ready():
 	emit_signal("move", get_global_position())
@@ -81,14 +81,14 @@ func set_current_cell(cell):
 	cell_pos = (cell * size)
 	cell_center = (cell * size) + Vector2(half_size, half_size)
 
-func teleport(destination : Vector2):
+func teleport(to : Vector2):
 	frozen = true
-	teleport_to = destination
-	TransitionAnimation.play("Enter Secret Passage")
+	teleport_to = to
+	DissolveAnimation.play("dissolve")
 
 func _physics_process(delta):
 	if frozen:
-		pass
+		return
 
 	get_input()
 	position += velocity * delta
@@ -102,13 +102,17 @@ func _physics_process(delta):
 #	if available_directions.down == false:
 #		position.y = clamp(position.y, cell_pos.y + size, cell_center.y)
 
+func _on_AnimatedSprite_animation_finished():
+	print("animation finished")
+	if DissolveAnimation.is_playing():
+		DissolveAnimation.stop()
 
-func _on_AnimationPlayer_animation_finished(anim_name):
 	if teleport_to is Vector2:
 		frozen = true
 		position = teleport_to
 		emit_signal("teleported", position)
 		teleport_to = null
-		TransitionAnimation.play_backwards("Enter Secret Passage")
+		DissolveAnimation.play("dissolve", true)
 	else:
 		frozen = false
+

@@ -1,10 +1,11 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=22 format=2]
 
 [ext_resource path="res://Maze.gd" type="Script" id=1]
 [ext_resource path="res://assets/maze-walls.png" type="Texture" id=2]
 [ext_resource path="res://Player.gd" type="Script" id=3]
 [ext_resource path="res://assets/potato.png" type="Texture" id=5]
 [ext_resource path="res://Potato.gd" type="Script" id=6]
+[ext_resource path="res://assets/player-dissolve-mask.png" type="Texture" id=7]
 
 [sub_resource type="TileSet" id=1]
 0/name = "0"
@@ -238,89 +239,51 @@ extents = Vector2( 9.5, 8 )
 [sub_resource type="CanvasItemMaterial" id=5]
 blend_mode = 3
 
+[sub_resource type="CircleShape2D" id=19]
+radius = 1.0
+
 [sub_resource type="RectangleShape2D" id=4]
 extents = Vector2( 5, 5 )
 
-[sub_resource type="Animation" id=7]
-resource_name = "Enter Secret Passage"
-tracks/0/type = "value"
-tracks/0/path = NodePath("Polygon2D:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 2.46229, 0.203063 ),
-"update": 0,
-"values": [ Vector2( 1, 1 ), Vector2( 1e-05, 1e-05 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("Polygon2D:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 2.46, 0.203 ),
-"update": 0,
-"values": [ Vector2( -5, -5 ), Vector2( 0, 0 ) ]
-}
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 7 )
+region = Rect2( 0, 0, 10, 10 )
 
-[sub_resource type="Animation" id=9]
-resource_name = "Exit Secret Passage"
-tracks/0/type = "value"
-tracks/0/path = NodePath("Polygon2D:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 0.203, 2.46 ),
-"update": 0,
-"values": [ Vector2( 1e-05, 1e-05 ), Vector2( 1, 1 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("Polygon2D:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0, 1 ),
-"transitions": PoolRealArray( 0.203, 2.46 ),
-"update": 0,
-"values": [ Vector2( 0, 0 ), Vector2( -5, -5 ) ]
-}
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 7 )
+region = Rect2( 10, 0, 10, 10 )
 
-[sub_resource type="Animation" id=8]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/path = NodePath("Polygon2D:scale")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Vector2( 1, 1 ) ]
-}
-tracks/1/type = "value"
-tracks/1/path = NodePath("Polygon2D:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/keys = {
-"times": PoolRealArray( 0 ),
-"transitions": PoolRealArray( 1 ),
-"update": 0,
-"values": [ Vector2( -5, -5 ) ]
-}
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 7 )
+region = Rect2( 20, 0, 10, 10 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 7 )
+region = Rect2( 30, 0, 10, 10 )
+
+[sub_resource type="AtlasTexture" id=14]
+atlas = ExtResource( 7 )
+region = Rect2( 40, 0, 10, 10 )
+
+[sub_resource type="AtlasTexture" id=15]
+atlas = ExtResource( 7 )
+region = Rect2( 50, 0, 10, 10 )
+
+[sub_resource type="AtlasTexture" id=16]
+atlas = ExtResource( 7 )
+region = Rect2( 60, 0, 10, 10 )
+
+[sub_resource type="AtlasTexture" id=17]
+atlas = ExtResource( 7 )
+region = Rect2( 70, 0, 10, 10 )
+
+[sub_resource type="SpriteFrames" id=18]
+animations = [ {
+"frames": [ SubResource( 10 ), SubResource( 11 ), SubResource( 12 ), SubResource( 13 ), SubResource( 14 ), SubResource( 15 ), SubResource( 16 ), SubResource( 17 ) ],
+"loop": false,
+"name": "dissolve",
+"speed": 5.0
+} ]
 
 [sub_resource type="CanvasItemMaterial" id=6]
 blend_mode = 3
@@ -351,28 +314,29 @@ centered = false
 
 [node name="Pings" type="Node2D" parent="."]
 
-[node name="Player" type="Area2D" parent="."]
+[node name="Player" type="Node2D" parent="."]
 script = ExtResource( 3 )
 
-[node name="Polygon2D" type="Polygon2D" parent="Player"]
-position = Vector2( -5, -5 )
-polygon = PoolVector2Array( 0, 0, 10, 0, 10, 10, 0, 10 )
-vertex_colors = PoolColorArray( 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 )
+[node name="PlayerCore" type="Area2D" parent="Player"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/PlayerCore"]
+shape = SubResource( 19 )
+
+[node name="PlayerBody" type="Area2D" parent="Player"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player/PlayerBody"]
 shape = SubResource( 4 )
+
+[node name="PlayerSprite" type="AnimatedSprite" parent="Player"]
+frames = SubResource( 18 )
+animation = "dissolve"
 
 [node name="PlayerCamera" type="Camera2D" parent="Player"]
 current = true
 zoom = Vector2( 0.5, 0.5 )
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
-"anims/Enter Secret Passage" = SubResource( 7 )
-"anims/Exit Secret Passage" = SubResource( 9 )
-anims/RESET = SubResource( 8 )
-
 [node name="ColorMask" type="Sprite" parent="."]
 material = SubResource( 6 )
 
 [connection signal="area_entered" from="Potato" to="Potato" method="_on_Potato_area_entered"]
-[connection signal="animation_finished" from="Player/AnimationPlayer" to="Player" method="_on_AnimationPlayer_animation_finished"]
+[connection signal="animation_finished" from="Player/PlayerSprite" to="Player" method="_on_AnimatedSprite_animation_finished"]

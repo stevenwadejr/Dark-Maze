@@ -54,14 +54,10 @@ func _ready():
 	position_potato()
 	overlay_color()
 	generate_fog()
-#	update_fog(Player.position)
+	update_fog(Player.position)
 	Player.connect('move', self, '_on_player_move')
 	Player.connect('drop_ping', self, '_on_player_drop_ping')
 	Player.connect('teleported', self, 'update_fog')
-	
-	# Temporary debugging to test secret passageways with fog
-	Player.position = secret_passages['NW'].position + Vector2(50, 0)
-	update_fog(Player.position)
 
 func generate_fog():
 	fogImage.create(maze_width, maze_height, false, Image.FORMAT_RGBAH)
@@ -220,6 +216,7 @@ func connect_passageways():
 	for dir in secret_passages:
 		secret_passages[dir].connect('player_entered', self, '_transport_player')
 
-func _transport_player(destination_passageway : SecretPassageway):
+func _transport_player(destination_passageway : SecretPassageway, origin_passageway: SecretPassageway):
 	destination_passageway.accept_incoming()
+	Player.position = origin_passageway.position
 	Player.teleport(destination_passageway.position)
